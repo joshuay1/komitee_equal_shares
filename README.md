@@ -14,10 +14,9 @@ A lightweight, static web app to view and explore allocations computed with the 
 # from this folder
 npm install
 npm run start
-# then open http://localhost:5173
 ```
 
-Drag-and-drop a `.pb` file to compute and render results. By default, the app auto-loads `data/kk25.pb`.
+By default, the app auto-loads `data/kk25.pb`.
 
 ## Features
 
