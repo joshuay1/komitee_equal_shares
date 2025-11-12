@@ -1,0 +1,16 @@
+Komitee Equal Shares — NOTICE
+
+This software is distributed under the MIT License. See LICENSE for details.
+
+Attribution and provenance
+- Original work (2023): Method of Equal Shares Online Computation Tool by Dominik Peters (MIT).
+- Substantial modifications (2025): Joshua C. Yang and contributors. Changes include UI/UX overhaul, internationalization, table rendering and responsive layout, masking/receipts features, and deployment guidance.
+
+Third-party software
+The following third-party libraries are included under their respective licenses in js/libraries/:
+- ECharts (see js/libraries/echarts.license.txt)
+- Sortable (see js/libraries/sortable.license.txt)
+- Fraction.js (see js/libraries/fraction.license.txt)
+- SheetJS (see js/libraries/sheetjs.license.txt)
+
+If you redistribute this software, retain this NOTICE, the LICENSE file, and the third‑party license files.

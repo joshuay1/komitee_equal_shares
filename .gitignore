@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+npm-package
+
+# Editors/OS
+.vscode/
+.idea/
+
+# Env files
+.env
+.env.*
+
+# Build outputs (if added later)
+dist/
+build/
+coverage/
+
+# Misc
+js/unused/*

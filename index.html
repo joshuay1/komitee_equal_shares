@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kultur Komitee Winterthur Auswertung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/sortable-theme-light.css" />
+    <script type="module" src="./js/main.js"></script>
+    <link rel="icon" href="img/arrow.png" data-rh="true">
+    <link rel="preload" href="js/methodOfEqualSharesWorker.js" as="worker" />
+    <style></style>
+</head>
+
+<body>
+    <!-- Language switch (top-right) -->
+    <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-btn" data-lang="en" aria-pressed="true" title="English (Australia)"><span class="flag" id="flag-en" aria-hidden="true"></span> EN</button>
+        <button class="lang-btn" data-lang="de" aria-pressed="false" title="Deutsch (Schweiz)"><span class="flag" id="flag-de" aria-hidden="true"></span> DE</button>
+    </div>
+    <main>
+        <div class="left-side">
+            <h1>KULTUR KOMITEE Winterthur 2025</h1>
+
+            <div id="fileInfo" style="display: none;">
+                <!-- <img src="img/file-earmark-check.svg" width="50"> -->
+                <div></div>
+            </div>
+
+            <!-- Moved Group : Individual slider to top -->
+
+            <div class="control-box" data-field="totalBudget">
+                <h2 data-i18n="used_budget">Used Budget</h2>
+                <div class="slider-container slider-block budget-slider-wrap">
+                    <div class="budget-slider-row">
+                        <button type="button" id="totalBudgetMinus" class="btn-step" aria-label="Decrease budget">−</button>
+                        <input type="range" id="totalBudget" name="totalBudget"
+                            min="10000" max="2000000" value="1400000" step="5000"
+                            oninput="updateBudgetFromSlider(this.value)" class="range-full" />
+                        <button type="button" id="totalBudgetPlus" class="btn-step" aria-label="Increase budget">+</button>
+                    </div>
+                    <output for="totalBudget" class="output-number">0</output>
+                    
+                </div>
+            </div>
+
+
+        <div class="control-box" data-field="groupIndiRatio">
+            <h2 data-i18n="group_individual">Group : Individual</h2>
+                    <div class="slider-container slider-block budget-slider-wrap">
+                        <div class="budget-slider-row">
+                            <button type="button" id="groupIndiMinus" class="btn-step" aria-label="Decrease group ratio">−</button>
+                            <input type="range" id="groupIndiRatio" min="0" max="1" value="0.5" step="0.1" class="range-full">
+                            <button type="button" id="groupIndiPlus" class="btn-step" aria-label="Increase group ratio">+</button>
+                        </div>
+                        <output id="ratioOutput" class="output-number">50:50</output>
+                        
+                    </div>
+            </div>
+
+
+            <!-- Unified Reset -->
+            <div class="control-box" id="resetAllBox" style="display:none;">
+                <div class="reset-all-row">
+                    <button type="button" id="resetAll" class="btn-step btn-reset-all" data-i18n="reset">Reset</button>
+                </div>
+            </div>
+
+            <!-- Budget overview summary (fixed) -->
+            <div id="budget-overview" class="control-box"></div>
+
+            <!-- Toggle Funding Split column -->
+            <div class="control-box" data-field="toggleSplit">
+                <label class="toggle-row">
+                    <input type="checkbox" id="toggleFundingSplit" checked>
+                    <span data-i18n="toggle_split">Show Funding Split column</span>
+                </label>
+            </div>
+
+<script>
+    // Function to update budget display when slider changes, but keep it hidden
+    function updateBudgetFromSlider(value) {
+        // This function is a placeholder - the actual implementation will be in budgetDisplay.js
+        // We keep this as the oninput handler but the slider itself is hidden
+    }
+    // Increment / decrement buttons for used budget
+    document.addEventListener('DOMContentLoaded', () => {
+        // Total budget +/-
+        const budgetSlider = document.getElementById('totalBudget');
+        const minusBudget = document.getElementById('totalBudgetMinus');
+        const plusBudget = document.getElementById('totalBudgetPlus');
+        const resetAllBox = document.getElementById('resetAllBox');
+        const resetAllBtn = document.getElementById('resetAll');
+
+        const showOrHideReset = () => {
+            const budgetDefault = budgetSlider ? (budgetSlider.defaultValue || budgetSlider.getAttribute('value') || '1400000') : '1400000';
+            const ratioDefault = ratioSlider ? (ratioSlider.defaultValue || ratioSlider.getAttribute('value') || '0.5') : '0.5';
+            const budgetChanged = budgetSlider && parseInt(budgetSlider.value,10) !== parseInt(budgetDefault,10);
+            const ratioChanged = ratioSlider && parseFloat(ratioSlider.value) !== parseFloat(ratioDefault);
+            if (budgetChanged || ratioChanged) {
+                resetAllBox.style.display = 'block';
+            } else {
+                resetAllBox.style.display = 'none';
+            }
+        };
+
+        if (budgetSlider) {
+            // Also respond when the slider is dragged directly
+            budgetSlider.addEventListener('input', showOrHideReset);
+        }
+        if(budgetSlider && minusBudget && plusBudget){
+            const stepB = parseInt(budgetSlider.step,10) || 5000;
+            const clampB = v => Math.min(parseInt(budgetSlider.max,10), Math.max(parseInt(budgetSlider.min,10), v));
+            const updateB = v => { budgetSlider.value = clampB(v); budgetSlider.dispatchEvent(new Event('input',{bubbles:true})); showOrHideReset(); };
+            minusBudget.addEventListener('click',()=> updateB(parseInt(budgetSlider.value,10) - stepB));
+            plusBudget.addEventListener('click',()=> updateB(parseInt(budgetSlider.value,10) + stepB));
+        }
+        // Group:Individual ratio +/-
+        const ratioSlider = document.getElementById('groupIndiRatio');
+        const minusRatio = document.getElementById('groupIndiMinus');
+        const plusRatio = document.getElementById('groupIndiPlus');
+        if (ratioSlider) {
+            // Also respond when the slider is dragged directly
+            ratioSlider.addEventListener('input', showOrHideReset);
+        }
+        if(ratioSlider && minusRatio && plusRatio){
+            const stepR = parseFloat(ratioSlider.step) || 0.1;
+            const clampR = v => Math.min(parseFloat(ratioSlider.max), Math.max(parseFloat(ratioSlider.min), v));
+            const updateR = v => { ratioSlider.value = clampR(v).toFixed(2); ratioSlider.dispatchEvent(new Event('input',{bubbles:true})); showOrHideReset(); };
+            minusRatio.addEventListener('click',()=> updateR(parseFloat(ratioSlider.value) - stepR));
+            plusRatio.addEventListener('click',()=> updateR(parseFloat(ratioSlider.value) + stepR));
+        }
+        // Unified Reset: reset budget and ratio to defaults
+        const resetAll = document.getElementById('resetAll');
+        if (resetAllBtn) {
+            resetAllBtn.addEventListener('click', () => {
+                if (budgetSlider) {
+                    const defB = budgetSlider.defaultValue || budgetSlider.getAttribute('value') || '1400000';
+                    budgetSlider.value = parseInt(defB, 10);
+                    budgetSlider.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                if (ratioSlider) {
+                    const defR = ratioSlider.defaultValue || ratioSlider.getAttribute('value') || '0.5';
+                    ratioSlider.value = parseFloat(defR);
+                    ratioSlider.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                showOrHideReset();
+            });
+        }
+
+        // Initial evaluation (hidden at load)
+        showOrHideReset();
+    });
+</script>
+
+            <!-- (Group : Individual slider moved above) -->
+
+            
+        </div>
+    <div class="right-side results-wrapper">
+            <h2 id="results-header" style="display: none;" data-i18n="results_header">Komitee Equal Shares Result</h2>
+        
+            <div id="progress" style="display: none; margin-bottom:10px;">
+                <span id="progress-text"></span>
+            </div>
+
+            <section id="results-section" class="results-wrapper">
+                <!-- Project results table will be inserted here -->
+            </section>
+
+            <!-- 🔹 Budget Usage Table will be inserted below the budget chart -->
+            <div id="budget-usage" class="results-wrapper"></div>
+
+            <div id="drop-overlay">
+                <div id="drop-overlay-instruction" data-i18n="drop_overlay">Drop a .pb file to import.</div>
+            </div>
+        </div>
+    </main>
+
+        <a id="disclaimer" style="line-height: 0.4rem; margin: 40px;" data-i18n="disclaimer_text">
+            The Komitee Equal Shares platform was developed by Joshua C. Yang (joyang@ethz.ch),
+            adapted from the "Method of Equal Shares: Online Computation Tool" by Dominik Peters.
+        </a>
+
+    <!-- Removed unused Popper/Tippy and redundant ECharts CDN (loaded locally when needed) -->
+    <script type="module">
+        import { i18n } from './js/i18n.js';
+        i18n.init();
+        // Initialize Funding Split toggle state
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set flag emojis via JS to avoid encoding issues in HTML
+            const flagEn = document.getElementById('flag-en');
+            const flagDe = document.getElementById('flag-de');
+            if (flagEn) flagEn.textContent = "\uD83C\uDDE6\uD83C\uDDFA"; // AU
+            if (flagDe) flagDe.textContent = "\uD83C\uDDE8\uD83C\uDDED"; // CH
+
+            const splitToggle = document.getElementById('toggleFundingSplit');
+            if (splitToggle) {
+                const saved = localStorage.getItem('showFundingSplit');
+                const show = saved === null ? true : saved === '1';
+                splitToggle.checked = show;
+                document.body.classList.toggle('hide-split', !show);
+                splitToggle.addEventListener('change', () => {
+                    const s = splitToggle.checked;
+                    document.body.classList.toggle('hide-split', !s);
+                    localStorage.setItem('showFundingSplit', s ? '1' : '0');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
